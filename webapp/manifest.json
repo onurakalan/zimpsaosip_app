@@ -1,5 +1,5 @@
 {
-  "_version": "1.40.0",
+  "_version": "1.37.0",
   "sap.app": {
     "id": "com.improva.zimpsaosipapp",
     "type": "application",
@@ -28,9 +28,10 @@
     }
   },
   "sap.ui": {
+		"fullWidth": true,
     "technology": "UI5",
     "icons": {
-      "icon": "",
+      "icon": "sap-icon://sales-order",
       "favIcon": "",
       "phone": "",
       "phone@2": "",
@@ -44,9 +45,24 @@
     }
   },
   "sap.ui5": {
+    "rootView": {
+      "viewName": "com.improva.zimpsaosipapp.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "App"
+    },
+    "services": {
+			"ShellUIService": {
+				"factoryName": "sap.ushell.ui5service.ShellUIService",
+				"lazy": false,
+				"settings": {
+					"setTitle": "auto"
+				}
+			}
+		},
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.102.1",
+      "minUI5Version": "1.71.49",
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
@@ -55,7 +71,10 @@
         "sap.ui.comp": {},
         "sap.ui.generic.app": {},
         "sap.ui.table": {},
-        "sap.ushell": {}
+        "sap.ushell": {},
+        "sap.uxap":{
+          "minVersion": ""
+        }
       }
     },
     "contentDensities": {
@@ -63,18 +82,28 @@
       "cozy": true
     },
     "models": {
-      "i18n": {
-        "type": "sap.ui.model.resource.ResourceModel",
-        "settings": {
-          "bundleName": "com.improva.zimpsaosipapp.i18n.i18n"
-        }
-      },
-      "": {
-        "dataSource": "mainService",
-        "preload": true,
-        "settings": {}
-      }
-    },
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "com.improva.ZIMPSAOSIP_APP.i18n.i18n"
+				}
+			},
+			"": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultCountMode": "None",
+					"json": true,
+					"defaultBindingMode": "OneWay",
+					"defaultOperationMode": "Auto"
+				},
+				"dataSource": "mainService",
+				"preload": true
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties"
+			}
+		},
     "resources": {
       "css": [
         {
@@ -83,39 +112,38 @@
       ]
     },
     "routing": {
-      "config": {
-        "routerClass": "sap.m.routing.Router",
-        "viewType": "XML",
-        "async": true,
-        "viewPath": "com.improva.zimpsaosipapp.view",
-        "controlAggregation": "pages",
-        "controlId": "app",
-        "clearControlAggregation": false
-      },
-      "routes": [
-        {
-          "name": "RouteMain",
-          "pattern": ":?query:",
-          "target": [
-            "TargetMain"
-          ]
-        }
-      ],
-      "targets": {
-        "TargetMain": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "Main",
-          "viewName": "Main"
-        }
-      }
-    },
-    "rootView": {
-      "viewName": "com.improva.zimpsaosipapp.view.App",
-      "type": "XML",
-      "async": true,
-      "id": "App"
-    }
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "com.improva.zimpsaosipapp.view",
+				"controlId": "app",
+				"controlAggregation": "pages",
+				"bypassed": {
+					"target": ["notFound"]
+				},
+				"async": true
+			},
+			"routes": [{
+				"pattern": "",
+				"name": "Main",
+				"view": "Main",
+				"targetControl": "app"
+			}],
+			"targets": {
+				"Main": {
+					"viewType": "XML",
+					"viewName": "Main",
+					"viewId": "Main"
+				},
+				"objectNotFound": {
+					"viewName": "ObjectNotFound",
+					"viewId": "objectNotFound"
+				},
+				"notFound": {
+					"viewName": "NotFound",
+					"viewId": "notFound"
+				}
+			}
+		}
   }
 }

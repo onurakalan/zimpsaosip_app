@@ -1,8 +1,116 @@
-<mvc:View controllerName="com.improva.zimpsaosipapp.controller.Main"
+<mvc:View controllerName="com.improva.zimpsaosipapp.controller.Main" 
+    displayBlock="true" 
+    xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns="sap.m" 
     xmlns:mvc="sap.ui.core.mvc" 
-    displayBlock="true"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-        <content />
-    </Page>
+    xmlns:uxap="sap.uxap" 
+    xmlns:f="sap.ui.layout.form" 
+    xmlns:core="sap.ui.core"
+     height="100%">
+	
+    <App id="app" busy="{mainView>/busy}" busyIndicatorDelay="{mainView>/delay}">
+		<pages>
+			<Page title="{i18n>title}" titleLevel="H3">
+				<uxap:ObjectPageLayout id="ObjectPageLayout" showAnchorBarPopover="false" upperCaseAnchorBar="false">
+					<uxap:sections>
+						<uxap:ObjectPageSection title="{i18n>headerTitle}" titleUppercase="false">
+							<uxap:subSections>
+								<uxap:ObjectPageSubSection id="sub1" title="{i18n>orderHeader}" titleUppercase="false">
+									
+								</uxap:ObjectPageSubSection>
+							</uxap:subSections>
+						</uxap:ObjectPageSection>
+						<uxap:ObjectPageSection title="{i18n>orderItem2}" titleUppercase="false" showTitle="true">
+							<uxap:subSections>
+								<uxap:ObjectPageSubSection title="{i18n>orderItem}" titleUppercase="false">
+									<uxap:blocks>
+										<Table id="migoListId" inset="false" items="{Bayisip>/results}" backgroundDesign="Transparent" width="auto" class="sapUiNoContentPadding"
+											modeAnimationOn="true" mode="MultiSelect" selectionChange="onSelectedDetail">
+											<headerToolbar>
+												<Toolbar>
+													<Label text="{i18n>orderItem}"/>
+													<ToolbarSpacer/>
+													<ToolbarSeparator/>
+													<Button icon="sap-icon://add" press="onAddBayisip" tooltip="{i18n>cikarBtnTx}"/>
+													<Button icon="sap-icon://sys-minus" press="onRemoveBayisip" tooltip="{i18n>cikarBtnTx}"/>
+												</Toolbar>
+											</headerToolbar>
+											<infoToolbar>
+												<OverflowToolbar visible="false" id="idInfoToolbar">
+													<Label id="idFilterLabel"/>
+												</OverflowToolbar>
+											</infoToolbar>
+											<columns >
+												<Column minScreenWidth="Phone" demandPopin="true" width="auto">
+													<Text text="{i18n>sipKlm}"/>
+												</Column>
+												<Column minScreenWidth="Phone" demandPopin="true" width="auto">
+													<Text text="{i18n>klmTur}"/>
+												</Column>
+												<Column minScreenWidth="Phone" demandPopin="true" width="auto">
+													<Text text="{i18n>mlzm}"/>
+												</Column>
+												<Column minScreenWidth="Phone" demandPopin="true" width="auto">
+													<Text text="{i18n>mktr}"/>
+												</Column>
+												<Column minScreenWidth="Phone" demandPopin="true" width="auto">
+													<Text text="{i18n>tutar}"/>
+												</Column>
+												<Column minScreenWidth="Tablet" demandPopin="true" width="auto">
+													<Text text="{i18n>isknt}"/>
+												</Column>
+												<Column minScreenWidth="Tablet" demandPopin="true" width="auto">
+													<Text text="{i18n>netDeger}"/>
+												</Column>
+												<Column minScreenWidth="Tablet" demandPopin="true" width="auto">
+													<Text text="{i18n>paraBrm}"/>
+												</Column>
+											</columns>
+											<items>
+												<ColumnListItem >
+													<cells>
+														<ObjectIdentifier title="{= parseFloat(${Bayisip>sipKlm})}"/>
+														<ObjectIdentifier title="{= parseFloat(${Bayisip>KalemTuru})}" text="{Bayisip>KalemTuruTnm}"/>
+														<ObjectIdentifier title="{= parseFloat(${Bayisip>Malzeme})}" text="{Bayisip>MalzemeTnm}"/>
+														
+														<Input id="idMik"
+															value="{path:'Bayisip>Miktar', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+															change="onChangeMiktar" description="{Bayisip>Birim}" valueState="{= ${Bayisip>Miktar} === '0' ? 'Error' : 'None'}"/>
+														
+														<Input placeholder="{i18n>tutar}" id="idTutar"
+															value="{path:'Bayisip>Tutar', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+															valueStateText="{i18n>tutar}" valueState="{= ${Bayisip>Tutar} === '' ? 'Error' : 'None'}"/>
+														
+														<Input  id="idIsknt" 
+															value="{path:'Bayisip>Iskonto', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+															valueStateText="{i18n>isknt}" submit="onLgort" valueState="{= ${Bayisip>Lgort} === '' ? 'Error' : 'None'}"/>
+														
+														<Input id="idNet"
+															value="{Bayisip>NetDeger}" valueStateText="{i18n>LgortTx}" valueState="{= ${Bayisip>Lgort} === '' ? 'Error' : 'None'}"/>
+														
+														<Input showValueHelp="true" valueHelpRequest="handleValueHelpLgort" valueHelpOnly="true" placeholder="{i18n>paraBrm}" id="idPb"
+															value="{Bayisip>ParaBirimi}" valueStateText="{i18n>LgortTx}" submit="onLgort" valueState="{= ${Bayisip>ParaBirimi} === '' ? 'Error' : 'None'}"/>
+														
+													</cells>
+												</ColumnListItem>
+											</items>
+										</Table>
+									</uxap:blocks>
+									<uxap:actions></uxap:actions>
+								</uxap:ObjectPageSubSection>
+							</uxap:subSections>
+						</uxap:ObjectPageSection>
+					</uxap:sections>
+				</uxap:ObjectPageLayout>
+				
+				<footer>
+					<OverflowToolbar>
+						<Button text="{i18n>bayiSipOlustur}" press="onPressSiparisYaratma" type="Accept" />
+						<ToolbarSpacer/>
+						<Button type="Emphasized" text="{i18n>etknOlustur}"/>
+					</OverflowToolbar>
+				</footer>
+			</Page>
+		</pages>
+	</App>
 </mvc:View>

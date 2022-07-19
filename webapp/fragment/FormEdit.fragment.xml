@@ -1,0 +1,99 @@
+<core:FragmentDefinition xmlns="sap.m" 
+		xmlns:l="sap.ui.layout" 
+		xmlns:f="sap.ui.layout.form" 
+		xmlns:core="sap.ui.core"
+		autoPrefixId="true">
+	<f:SimpleForm
+		id="idForms" 
+		maxContainerCols="2" labelSpanL="3" labelSpanM="2" columnsL="2" columnsM="2" editable="true"
+			layout="ColumnLayout" labelSpanXL="3" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+			emptySpanS="0" columnsXL="2" singleContainerFullSize="false" >
+			<f:content>
+				<Label text="{i18n>auart}" labelFor="selAuart" required="true"/>
+				<ComboBox id="selAuart" enabled="true" width="19rem"
+						value="{header>/Auart}"
+						selectionChange="onChangeAuart" 
+						items="{/ShAuartSet}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Auart}" text="{Bezei}"  additionalText="{Auart}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						 press="onClearAuart" visible="{= ${header>/Auart} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>vkorg}"  labelFor="selVkorg" required="true"/>
+				<ComboBox id="selVkorg" enabled="true" width="19rem" selectionChange="onChangeVkorg" 
+						items="{/ShVkorgSet}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Vkorg}" text="{VkorgDesc}" additionalText="{Vkorg}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearVkorg" visible="{= ${header>/Vkorg} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>vtweg}" labelFor="selVtweg" required="true"/>
+				<ComboBox id="selVtweg" enabled="true"  width="19rem" selectionChange="onChangeVtweg" 
+						items="{path:'/ShVtwegSet',sorter:{path:'Vtweg',ascending: true },
+								filters:[{path:'Hide',operator:'EQ',value1:false}]}" 
+						showSecondaryValues= "true" filterSecondaryValues="true" >
+					<core:ListItem key="{Vtweg}" text="{Vtext}" additionalText="{Vtweg}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearVtweg" visible="{= ${header>/Vtweg} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>spart}" labelFor="selSpart" required="true"/>
+				<ComboBox id="selSpart" enabled="true" width="19rem" selectionChange="onChangeSpart"  
+					items="{/ShSpartSet}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Spart}" text="{SpartDesc}" additionalText="{Spart}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearSpart" visible="{= ${header>/Spart} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>vkbur}" labelFor="selVkbur" required="true"/>
+				<ComboBox id="selVkbur" enabled="true" width="19rem" selectionChange="onChangeVkbur" 
+					items="{/ShVkburSet}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Vkbur}" text="{VkburDesc}" additionalText="{Vkbur}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearVkbur" visible="{= ${header>/Vkbur} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>vkgrp}" labelFor="selVkgrp" required="true"/>
+				<ComboBox id="selVkgrp"  enabled="true" width="19rem" selectionChange="onChangeVkgrp" 
+					items="{/ShVkgrpSet}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Vkgrp}" text="{VkgrpDesc}" additionalText="{Vkgrp}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearVkgrp" visible="{= ${header>/Vkgrp} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>kunnr}" labelFor="selKunnr" required="true"/>
+				<ComboBox id="selKunnr" enabled="true" width="19rem" selectionChange="onChangeKunnr" 
+					items="{/ShMusteriSet}" showSecondaryValues="true" filterSecondaryValues="true" >
+					<core:ListItem key="{Kunnr}" text="{ parts : [ 'Name1','Name2' ] }" additionalText="{Kunnr}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearKunnr" visible="{= ${header>/Kunnr} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>bstkd}"/>
+				<CheckBox select="onSelectCustRef"/>
+				<!---->
+				<Label text="{i18n>order}" labelFor="inpOrder" required="true"/>
+				<Input id="inpOrder" liveChange="onChangeOrder"  width="16rem" />
+				<!---->
+				<Label text="{i18n>zterm}" labelFor="selZterm" required="true"/>
+				<ComboBox id="selZterm"  enabled="true" width="19rem"  selectionChange="onChangeZterm" 
+					items="{/ShZtermSet}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Paymentterms}" text="{Paymenttermsname}" additionalText="{Paymentterms}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearZterm" visible="{= ${header>/Zterm} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>inco1}" labelFor="selInco1" required="true"/>
+				<ComboBox id="selInco1" enabled="true" width="19rem"  selectionChange="onChangeInco1" 
+					items="{/ShInco1Set}" showSecondaryValues="true" filterSecondaryValues="true">
+					<core:ListItem key="{Inco1}" text="{Bezei}" additionalText="{Inco1}"/>
+				</ComboBox>
+				<Button icon="sap-icon://sys-cancel" width="3rem" type="Transparent"
+						press="onClearInco1" visible="{= ${header>/Inco1} === '' ? false:true }"/>
+				<!---->
+				<Label text="{i18n>inco2}"/>
+				<Input id="inpInco2" width="16rem"/>
+			<!---->
+		</f:content>
+	</f:SimpleForm>
+</core:FragmentDefinition>

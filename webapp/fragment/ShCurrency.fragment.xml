@@ -1,0 +1,33 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+>
+	<SelectDialog
+  contentHeight="40%"
+  contentWidth="40%"
+        class="sapUiPopupWithPadding"
+		noDataText="{i18n>noDataProduct}"
+		title="{i18n>selProduct}"
+		search="handleSearchCurrency"
+		confirm="handleValueHelpCloseCurrency"
+		cancel="handleValueHelpCloseCurrency"
+		showClearButton="true"
+        rememberSelections = "true"
+        draggable="true"
+        resizable="true"
+        width="12em"
+		items="{
+			path : '/FcWaersSet',
+			sorter : {
+				path : 'Waers',
+				descending : false
+			}
+		}">
+		<StandardListItem
+			iconDensityAware="false"
+			iconInset="false"
+			title="{Waers}"
+			description="{Ktext}"
+            wrapping="true" />
+	</SelectDialog>
+</core:FragmentDefinition>

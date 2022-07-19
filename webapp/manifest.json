@@ -85,7 +85,7 @@
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
-					"bundleName": "com.improva.ZIMPSAOSIP_APP.i18n.i18n"
+					"bundleName": "com.improva.zimpsaosipapp.i18n.i18n"
 				}
 			},
 			"": {

@@ -1,0 +1,31 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+>
+	<SelectDialog
+  contentHeight="40%"
+  contentWidth="40%"
+        class="sapUiPopupWithPadding"
+		noDataText="{i18n>noData}"
+		title="{i18n>selRefdoc}"
+		search="handleSearchRefdoc"
+		confirm="handleValueHelpCloseRefdoc"
+		cancel="handleValueHelpCloseRefdoc"
+		showClearButton="true"
+        rememberSelections = "true"
+        draggable="true"
+        resizable="true"
+        width="12em"
+		items="{path:'/RefTeklifShSet',
+				sorter:{path:'Vbeln',descending:false}}">
+		<StandardListItem
+			iconDensityAware="false"
+			iconInset="false"
+			title="{Vbeln}"
+			description="{Posnr}"
+			info="{path:'Matnr'
+				   type:'sap.ui.model.odata.type.Number', 
+				   constraints:{isDigitSequence:false, maxLength:40}}"
+            wrapping="true" />
+	</SelectDialog>
+</core:FragmentDefinition>

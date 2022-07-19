@@ -1,0 +1,53 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+<f:SimpleForm
+		id="idForms2"   class="sapUiContentPadding" 
+		maxContainerCols="2" labelSpanL="3" labelSpanM="2" columnsL="2" columnsM="2" editable="true"
+			layout="ColumnLayout" labelSpanXL="3" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+			emptySpanS="0" columnsXL="2" singleContainerFullSize="false" >
+			<f:content>
+				<Label text="{i18n>auart}"/>
+				<Text text="{headerText>/AuartDesc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>vkorg}"/>
+				<Text text="{headerText>/VkorgDesc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>vtweg}"/>
+				<Text text="{headerText>/VtwegDesc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>spart}"/>
+				<Text text="{headerText>/SpartDesc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>vkbur}"/>
+				<Text text="{headerText>/VkburDesc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>vkgrp}"/>
+				<Text text="{headerText>/VkgrpDesc}" width="17rem"/>
+
+				<Label />
+				<Text width="17rem"/>
+				<!---->
+				<Label text="{i18n>kunnr}"/>
+				<Text text="{headerText>/CustomerName}" width="17rem" />
+				<!---->
+				<Label text="{i18n>bstkd}"/>
+				<CheckBox selected="{mainView>/bCustomerRef}" enabled="false"/>
+				<!---->
+				<Label text="{i18n>order}"/>
+				<Text text="{header>/Orderno}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>zterm}"/>
+				<Text text="{headerText>/ZtermDesc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>inco1}"/>
+				<Text text="{headerText>/Inco1Desc}" width="17rem"/>
+				<!---->
+				<Label text="{i18n>inco2}"/>
+				<Text text="{header>/Inco2}" width="17rem"/>
+			<!---->
+		</f:content>
+	</f:SimpleForm>
+</core:FragmentDefinition>

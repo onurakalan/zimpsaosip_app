@@ -6,7 +6,8 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	"sap/m/MessageToast",
 	"sap/m/MessageBox",
-	"sap/ui/model/json/JSONModel" ], function(Controller, History, Fragment, Filter, FilterOperator, MessageToast, MessageBox, JSONModel) {
+	"sap/ui/model/json/JSONModel" ], 
+	function(Controller,History, Fragment, Filter, FilterOperator, MessageToast, MessageBox, JSONModel) {
 	"use strict";
 
 	return Controller.extend("com.improva.zimpsaosipapp.controller.BaseController", {
@@ -93,6 +94,21 @@ sap.ui.define([
 				}
 			);
 		},
+		showConfirmationDialog: function (sConfMsg, fAccptFunction, pEntriy ) {
+			var bCompact = this.getOwnerComponent().getContentDensityClass() === "sapUiSizeCompact";
+			var pMBMessage = this.getView().getModel("i18n").getResourceBundle().getText(sConfMsg);
+			var pMBTitle = this.getView().getModel("i18n").getResourceBundle().getText("warnTitle");
+			var that = this;
+			MessageBox.confirm(
+				pMBMessage, {
+					styleClass: bCompact ? "sapUiSizeCompact" : "",
+					title: pMBTitle,
+					icon: sap.m.MessageBox.Icon.WARNING,
+					actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+					onClose: fAccptFunction.bind(that, pEntriy)
+				}
+			);
+		},
 		setJSONModel: function(aData, sModel) {
 			var oDataModel = new JSONModel();
 			var oData = {
@@ -104,8 +120,38 @@ sap.ui.define([
 			oDataModel.setSizeLimit(999999);
 			oDataModel.refresh();
 
-			return this.getView().setModel(oDataModel, sModel);
+			this.getView().setModel(oDataModel, sModel);
 
+		},
+		/* =========================================================== */
+		/* SEARCH HELP
+		/* =========================================================== */
+		onLiveChanged: function(oEvent) {
+			oEvent.getSource().setDescription("");
+		},
+		/* =========================================================== */
+		/* MESSAGE POPOVER
+		/* =========================================================== */
+		onMessagePopoverPress: function(oEvent) {
+			var oSourceControl = oEvent.getSource();
+			this._getMessagePopover().then(function(oMessagePopover) {
+				oMessagePopover.openBy(oSourceControl);
+			});
+		},
+		_getMessagePopover: function() {
+			var oView = this.getView();
+
+			// create popover lazily (singleton)
+			if (!this._pMessagePopover) {
+				this._pMessagePopover = Fragment.load({
+					id: oView.getId(),
+					name: "com.improva.zimpsaosipapp.fragment.Message"
+				}).then(function(oMessagePopover) {
+					oView.addDependent(oMessagePopover);
+					return oMessagePopover;
+				});
+			}
+			return this._pMessagePopover;
 		}
 
 	});

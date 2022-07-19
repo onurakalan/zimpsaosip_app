@@ -1,8 +1,26 @@
-sap.ui.define([], function() {
+sap.ui.define([
+	"sap/ui/core/library"
+], function(coreLibrary) {
 	"use strict";
-
+	var ValueState = coreLibrary.ValueState;
 	return {
+		isValidSelection(oObject){
+			var sSelectedKey = oObject.getSelectedKey(),
+				sValue = oObject.getValue(),
+				bReturn;
 
+			if (!sSelectedKey && sValue) {
+				oObject.setValueState(ValueState.Error);
+				bReturn = false;
+			} else {
+				oObject.setValueState(ValueState.None);
+				bReturn = true;
+			}
+			return bReturn;
+		},
+		setData:function(sObjectName,sFieldName,sValue){
+			this.getView().getModel(sObjectName).setProperty("/"+sFieldName, sValue);
+		},
 		/**
 		 * Rounds the number unit value to 2 digits
 		 * @public

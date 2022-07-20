@@ -186,8 +186,8 @@
                     <End EntitySet="TerminSet" Role="ToRole_ItemToTermin"/>
                 </AssociationSet>
             </EntityContainer>
-            <atom:link rel="self" href="http://10.6.71.8/sap/opu/odata/sap/ZIMPSAOSIP_ODATA_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
-            <atom:link rel="latest-version" href="http://10.6.71.8/sap/opu/odata/sap/ZIMPSAOSIP_ODATA_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="self" href="http://fioridev.limpo.com.tr/sap/opu/odata/sap/ZIMPSAOSIP_ODATA_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://fioridev.limpo.com.tr/sap/opu/odata/sap/ZIMPSAOSIP_ODATA_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
         </Schema>
     </edmx:DataServices>
 </edmx:Edmx>

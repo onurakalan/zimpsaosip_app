@@ -31,7 +31,11 @@ sap.ui.define([
 
 			// Set the initial fragments
 			this._showFormFragment("sub1","FormEdit");
-			this._showFormFragment("sub2","OrderItemTab");
+
+			let bDesktop = this.getOwnerComponent().getModel("device").getData().system.desktop;
+			debugger;
+
+			this._showFormFragment("sub2",bDesktop ? "OrderItemTabEdit" : "OrderItemTabDisp" );
 			
 		},
 		onAfterRendering:function(){
@@ -39,6 +43,7 @@ sap.ui.define([
 		onExit:function(){
 		},
 		onChangeAuart:function(oEvent){
+			var oSource = oEvent.getSource();
 			var oSource = oEvent.getSource();
 			
 			if ( !this.formatter.isValidSelection(oSource) ){
@@ -170,17 +175,14 @@ sap.ui.define([
 				return;
 			}
 
-			this._configFilterMaterial()
-			var aFilter = [];
-			var oFilter = {filter: this.aFilterMatnr };
-			var oFilterCopy = JSON.parse(JSON.stringify(oFilter));
+			var aFilter = this._configFilterMaterial()
 			
 			for (let itmIndx = 0; itmIndx < aItems.length; itmIndx++) {
-				oFilterCopy.filter.push( new Filter("Matnr",FilterOperator.EQ,aItems[itmIndx].Material));
+				aFilter.push( new Filter("Matnr",FilterOperator.EQ,aItems[itmIndx].Material));
 			}
 
 			this.getView().getModel().read("/ShMalzemeSet", {
-				filters: oFilterCopy.filter,
+				filters: aFilter,
 				success: function(oData) {
 					for (let itmIndx = 0; itmIndx < aItems.length; itmIndx++) {
 						if( oData.results.findIndex(o => o.Matnr === aItems[itmIndx].Material ) === -1 ){
@@ -200,17 +202,14 @@ sap.ui.define([
 				return;
 			}
 
-			this._configFilterRefdoc()
-			var aFilter = [];
-			var oFilter = {filter: this.aFilterRefdoc };
-			var oFilterCopy = JSON.parse(JSON.stringify(oFilter));
+			var aFilterRedoc = this._configFilterRefdoc()
 			
 			for (let itmIndx = 0; itmIndx < aItems.length; itmIndx++) {
-				oFilterCopy.filter.push( new Filter("Vbeln",FilterOperator.EQ,aItems[itmIndx].RefDocNo));
+				aFilterRedoc.push( new Filter("Vbeln",FilterOperator.EQ,aItems[itmIndx].RefDocNo));
 			}
 
 			this.getView().getModel().read("/RefTeklifSet", {
-				filters: oFilterCopy.filter,
+				filters: aFilterRedoc,
 				success: function(oData) {
 					for (let itmIndx = 0; itmIndx < aItems.length; itmIndx++) {
 						if( oData.results.findIndex(o => o.Vbeln === aItems[itmIndx].RefDocNo && 
@@ -497,10 +496,6 @@ sap.ui.define([
 			this.getView().getModel("header").setProperty("/Inco2", oSource.getValue());
 		},
 		handleSavePress:function(oEvent){
-			// check datamodels
-			
-			// models to temp
-
 			//display mode
 			this._toggleButtonsAndView(false);
 		},
@@ -552,6 +547,7 @@ sap.ui.define([
 
 			// Set the right form type
 			this._showFormFragment("sub1", bEdit ? "FormEdit" : "FormDisplay");
+			this._showFormFragment("sub2", bEdit ? "OrderItemTabEdit" : "OrderItemTabDisp");
 
 		},
 		_getFormFragment: function (sFragmentName) {
@@ -576,8 +572,43 @@ sap.ui.define([
 			var oItmLine = JSON.parse(JSON.stringify(this.datamodel.Item));
 			this.datamodel.Item.Posnr = this.datamodel.Item.Posnr + 1;
 			oItmLine.Posnr = this.datamodel.Item.Posnr * 10;
+
 			aItems.push(oItmLine);
 			this.getView().getModel("orderItems").refresh();
+		},
+		handleAddItemPopover: function(){
+			if (!this._oAddDialog) {
+				Fragment.load({
+					name: "com.improva.zimpsaosipapp.fragment.AddItem",
+					controller: this
+				}).then(function(oAddDialog){
+					this._oAddDialog = oAddDialog;
+					this.getView().addDependent(this._oAddDialog);
+					this._configAddDialog();
+					this._oAddDialog.open();
+				}.bind(this));
+			} else {
+				this._configAddDialog();
+				this._oAddDialog.open();
+			}
+		},
+		handleAddItemConfirm:function(){
+			this.datamodel.Item.Posnr = this.datamodel.Item.Posnr + 1;
+			var oItmLine = this.getView().getModel("itemView").getData();
+			oItmLine.Posnr = this.datamodel.Item.Posnr * 10;
+			
+			var aItems = this.getView().getModel("orderItems").getData().results;
+			aItems.push(oItmLine);
+			this.getView().getModel("orderItems").refresh();
+			
+			this._oAddDialog.close();
+		},
+		handleAddItemCancel:function(){
+			this._oAddDialog.close();
+		},
+		_configAddDialog:function(){
+			var oItem = JSON.parse(JSON.stringify(this.datamodel.Item));
+			this.getView().setModel(new JSONModel(oItem),"itemView");
 		},
 		handleRemoveItem: function(oEvent){
 			// remove selected Item
@@ -585,24 +616,33 @@ sap.ui.define([
 			var oModel = this.getView().getModel("orderItems");
 			var oTableData = oModel.getData();            
 			var aContexts = oTable.getSelectedContextPaths().sort();
-			debugger;
+			
 			for (let i=aContexts.length -1; i>=0; i--) {
 				let index = parseInt(aContexts[i].split("/results/")[1]);
 				oTableData.results.splice(index, 1);
-				this.datamodel.Item.Posnr = this.datamodel.Item.Posnr - 1;
 			}
+
 			//update Item Number
 			for (let index = 0; index < oTableData.results.length; index++) {
 				oTableData.results[index].Posnr = ( index + 1 ) * 10;
 			}
-
+			if (oTableData.results.length == 0){
+				this.datamodel.Item.Posnr = 0;
+			}else{
+				this.datamodel.Item.Posnr = oTableData.results[oTableData.results.length - 1].Posnr / 10;
+			}
 			oModel.refresh(); 
 			oTable.removeSelections(true);
 		},
 		handleValueHelp: function(oEvent) {
 			this.inputId = oEvent.getSource().getId();
-			this._sPath = oEvent.getSource().getBindingContext("orderItems").getPath();
-			this._oObject = oEvent.getSource().getBindingContext("orderItems").getObject();
+			if (oEvent.getSource().getBindingContext("orderItems")){
+				this._sPath = oEvent.getSource().getBindingContext("orderItems").getPath();
+				this._oObject = oEvent.getSource().getBindingContext("orderItems").getObject();
+			}else{
+				this._sPath = "";
+				this._oObject="";
+			}
 
 			if (!this._oValueHelpDialog) {
 				Fragment.load({
@@ -621,59 +661,69 @@ sap.ui.define([
 		},
 		_configValueHelpDialogMatnr: function() {		
 			
-			this._configFilterMaterial();
+			var aFilterMatnr = this._configFilterMaterial();
 
-			this._oValueHelpDialog.getBinding("items").filter(this.aFilterMatnr);
+			this._oValueHelpDialog.getBinding("items").filter(aFilterMatnr);
 		},
 		_configFilterMaterial:function(){
-			this.aFilterMatnr = [];
+			var aFilterMatnr = [];
 
 			var sVtweg = this.getView().getModel("header").getProperty("/Vtweg");
 			var sVkorg = this.getView().getModel("header").getProperty("/Vkorg");
 			if ( sVtweg ){
-				this.aFilterMatnr.push(new Filter("Vtweg",FilterOperator.EQ,sVtweg));
+				aFilterMatnr.push(new Filter("Vtweg",FilterOperator.EQ,sVtweg));
 			}
 			if (sVkorg){
-				this.aFilterMatnr.push(new Filter("Vkorg",FilterOperator.EQ,sVkorg));
+				aFilterMatnr.push(new Filter("Vkorg",FilterOperator.EQ,sVkorg));
 			}
+			return aFilterMatnr;
 		},
 
 		handleValueHelpClose : function (oEvent) {
-			var oModel = this.getView().getModel("orderItems");
-
 			var oSelectedItem = oEvent.getParameter("selectedItem");
-			
 			if (oSelectedItem){
 				var sMaterial = oSelectedItem.getTitle();
 				var sMaterialDesc = oSelectedItem.getDescription();
 				var sUnit = oSelectedItem.getInfo();
 			}
-
-			oModel.setProperty(this._sPath + "/Material", sMaterial);
-			oModel.setProperty(this._sPath + "/MaterialDesc", sMaterialDesc);
-			oModel.setProperty(this._sPath + "/Meins", sUnit);
-			oModel.refresh();
+			
+			if (this._sPath){
+				var oModel = this.getView().getModel("orderItems");
+				oModel.setProperty(this._sPath + "/Material", sMaterial);
+				oModel.setProperty(this._sPath + "/MaterialDesc", sMaterialDesc);
+				oModel.setProperty(this._sPath + "/Meins", sUnit);
+				oModel.refresh();
+			}else{
+				var oModel = this.getView().getModel("itemView");
+				oModel.setProperty("/Material", sMaterial);
+				oModel.setProperty("/MaterialDesc", sMaterialDesc);
+				oModel.setProperty("/Meins", sUnit);
+			}
 
 			this._checkInitial(this.byId(this.inputId,"errorMaterial"));
 		},
 		handleSearch: function(oEvent) {
-			var aFilter = [];
-			var oFilter = {filter: this.aFilterMatnr };
-			var oFilterCopy = JSON.parse(JSON.stringify(oFilter));
+			var aFilterMatnr = this._configFilterMaterial();
 
 			var sValue = oEvent.getParameter("value");
 			if (sValue){
-				oFilterCopy.filter.push( new	Filter("Matnr", FilterOperator.Contains, sValue) );
+				aFilterMatnr.push( new Filter("Matnr", FilterOperator.Contains, sValue) );
 			}
 			var oBinding = oEvent.getSource().getBinding("items");
-			oBinding.filter(oFilterCopy.filter);
+			oBinding.filter(aFilterMatnr);
 		},
 		// // // // // // // // // // // // // // // // // // // // // // // // // // // // a
 		// // // // // // // // // // // // // // // // // // // // // // // // // // // // a
 		handleValueHelpRefdoc: function(oEvent) {
 			this.inputId = oEvent.getSource().getId();
-			this._sPath = oEvent.getSource().getBindingContext("orderItems").getPath();
-			this._oObject = oEvent.getSource().getBindingContext("orderItems").getObject();
+			var oPath = oEvent.getSource().getBindingContext("orderItems");
+			if (oPath){
+				this._sPath = oPath.getPath();
+				this._oObject = oPath.getObject();
+			}else{
+				this._sPath = "";
+				this._oObject="";
+			}
 
 			if (!this._oValueHelpDialogRefdoc) {
 				Fragment.load({
@@ -692,12 +742,12 @@ sap.ui.define([
 		},
 		_configValueHelpDialogRefdoc: function() {		
 			
-			this._configFilterRefdoc();
+			var aFilterRefdoc = this._configFilterRefdoc();
 
-			this._oValueHelpDialogRefdoc.getBinding("items").filter(this.aFilterRefdoc);
+			this._oValueHelpDialogRefdoc.getBinding("items").filter(aFilterRefdoc);
 		},
 		_configFilterRefdoc:function(){
-			this.aFilterRefdoc = [];
+			var aFilterRefdoc = [];
 
 			var sVtweg = this.getView().getModel("header").getProperty("/Vtweg");
 			var sVkorg = this.getView().getModel("header").getProperty("/Vkorg");
@@ -707,59 +757,70 @@ sap.ui.define([
 			var sKunnr = this.getView().getModel("header").getProperty("/Kunnr");
 			
 			if ( sVtweg ){
-				this.aFilterRefdoc.push(new Filter("Vtweg",FilterOperator.EQ,sVtweg));
+				aFilterRefdoc.push(new Filter("Vtweg",FilterOperator.EQ,sVtweg));
 			}
 			if (sVkorg){
-				this.aFilterRefdoc.push(new Filter("Vkorg",FilterOperator.EQ,sVkorg));
+				aFilterRefdoc.push(new Filter("Vkorg",FilterOperator.EQ,sVkorg));
 			}
 			if (sSpart){
-				this.aFilterRefdoc.push(new Filter("Spart",FilterOperator.EQ,sSpart));
+				aFilterRefdoc.push(new Filter("Spart",FilterOperator.EQ,sSpart));
 			}
 			if (sVkbur){
-				this.aFilterRefdoc.push(new Filter("Vkbur",FilterOperator.EQ,sVkbur));
+				aFilterRefdoc.push(new Filter("Vkbur",FilterOperator.EQ,sVkbur));
 			}
 			if (sVkgrp){
-				this.aFilterRefdoc.push(new Filter("Vkgrp",FilterOperator.EQ,sVkgrp));
+				aFilterRefdoc.push(new Filter("Vkgrp",FilterOperator.EQ,sVkgrp));
 			}
 			if (sKunnr){
-				this.aFilterRefdoc.push(new Filter("Kunnr",FilterOperator.EQ,sKunnr));
+				aFilterRefdoc.push(new Filter("Kunnr",FilterOperator.EQ,sKunnr));
 			}
+			return aFilterRefdoc;
 		},
 
 		handleValueHelpCloseRefdoc : function (oEvent) {
-			var oModel = this.getView().getModel("orderItems");
 
 			var oSelectedItem = oEvent.getParameter("selectedItem");
-			
 			if (oSelectedItem){
 				var sRefdocNo = oSelectedItem.getTitle();
 				var sRefdocItm = oSelectedItem.getDescription();
 			}
-			oModel.setProperty(this._sPath + "/RefDocNo", sRefdocNo);
-			oModel.setProperty(this._sPath + "/RefDocItm", sRefdocItm);
-			oModel.refresh();
+			
+			if ( this._sPath ){
+				var oModel = this.getView().getModel("orderItems");
+				oModel.setProperty(this._sPath + "/RefDocNo", sRefdocNo);
+				oModel.setProperty(this._sPath + "/RefDocItm", sRefdocItm);
+				oModel.refresh();
+			}else{
+				var oModel = this.getView().getModel("itemView");
+				oModel.setProperty("/RefDocNo", sRefdocNo);
+				oModel.setProperty("/RefDocItm", sRefdocItm);
+				oModel.refresh();
+			}
 
 			this._checkInitial(this.byId(this.inputId,"checkRefdoc"));
 		},
 		handleSearchRefdoc: function(oEvent) {
-			var aFilter = [];
-			var oFilter = {filter: this.aFilterRefdoc };
-			var oFilterCopy = JSON.parse(JSON.stringify(oFilter));
+			var aFilterRefdoc = this._configFilterRefdoc();
 
 			var sValue = oEvent.getParameter("value");
 			if (sValue){
-				oFilterCopy.filter.push( new Filter("Vbeln", FilterOperator.Contains, sValue) );
+				aFilterRefdoc.push( new Filter("Vbeln", FilterOperator.Contains, sValue) );
 			}
 			var oBinding = oEvent.getSource().getBinding("items");
-			oBinding.filter(oFilterCopy.filter);
+			oBinding.filter(aFilterRefdoc);
 		},
 		// // // // // // // // // // // // // // // // // // // // // // // // // // // // a
 		// // // // // // // // // // // // // // // // // // // // // // // // // // // // a
 		handleValueHelpCurrency: function(oEvent) {
 			this.inputId = oEvent.getSource().getId();
-			this._sPath = oEvent.getSource().getBindingContext("orderItems").getPath();
-			this._oObject = oEvent.getSource().getBindingContext("orderItems").getObject();
-
+			var oPath = oEvent.getSource().getBindingContext("orderItems");
+			if(oPath){
+				this._sPath = oPath.getPath();
+				this._oObject = oPath.getObject();
+			}else{
+				this._sPath = "";
+				this._oObject="";
+			}
 			if (!this._oValueHelpDialogCurrency) {
 				Fragment.load({
 					name: "com.improva.zimpsaosipapp.fragment.ShCurrency",
@@ -787,15 +848,20 @@ sap.ui.define([
 		},
 
 		handleValueHelpCloseCurrency : function (oEvent) {
-			var oModel = this.getView().getModel("orderItems");
 
 			var oSelectedItem = oEvent.getParameter("selectedItem");
-			
 			if (oSelectedItem){
 				var sCurrency = oSelectedItem.getTitle();
 			}
-			oModel.setProperty(this._sPath + "/Currency", sCurrency);
-			oModel.refresh();
+			if ( this._sPath){
+				var oModel = this.getView().getModel("orderItems");
+				oModel.setProperty(this._sPath + "/Currency", sCurrency);
+				oModel.refresh();
+			}else{
+				var oModel = this.getView().getModel("itemView");
+				oModel.setProperty("/Currency", sCurrency);
+				oModel.refresh();
+			}
 
 			this._checkInitial(this.byId(this.inputId,"checkCurrency"));
 		},
@@ -806,74 +872,186 @@ sap.ui.define([
 		handleUpdateItem:function(oEvent){
 
 		},
-		onPressSchedule:function(oEvent){
+		onPressUsability:function(oEvent){
 			// simülasyon datası varsa açılır.
 
 			this._oObject = this.getView().getModel("orderItems").getObject(oEvent.getParameters("items").listItem.getBindingContextPath());
-
-			if (!this._oObject.Simulation ){
-				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("notExeUsability"));
-				return;
-			}
 
 			if (this._oObject.Usability.length === 0){
 				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("notFoundUsability"));
 				return;
 			}
 
-			if (!this._oValueHelpDialogSchedule) {
+			if (!this._oValueHelpDialogUsability) {
 				Fragment.load({
-					name: "com.improva.zimpsaosipapp.fragment.ScheduleList",
+					name: "com.improva.zimpsaosipapp.fragment.UsabilityList",
 					controller: this
 				}).then(function(oValueHelpDialog){
-					this._oValueHelpDialogSchedule = oValueHelpDialog;
-					this.getView().addDependent(this._oValueHelpDialogSchedule);
-					this._configValueHelpDialogSchedule();
-					this._oValueHelpDialogSchedule.open();
+					this._oValueHelpDialogUsability = oValueHelpDialog;
+					this.getView().addDependent(this._oValueHelpDialogUsability);
+					this._configValueHelpDialogUsability();
+					this._oValueHelpDialogUsability.open();
 				}.bind(this));
 			} else {
-				this._configValueHelpDialogSchedule();
-				this._oValueHelpDialogSchedule.open();
+				this._configValueHelpDialogUsability();
+				this._oValueHelpDialogUsability.open();
 			}
 		},
-		_configValueHelpDialogSchedule:function(){
+		_configValueHelpDialogUsability:function(){
 			// simülasyon datasını filtrele
-			this.setJSONModel(this._oObject.Usability,"scheduleList");
+			this.setJSONModel(this._oObject.Usability,"usabilityList");
 		},
-		simulateOrder:function(oEvent){
-			debugger;
-			//tablodan seçili satırları al
-			var aSelectedItems = this._getSelectedItems(this.byId("idOrderItemTab").getSelectedItems());
-
-			if ( aSelectedItems.length === 0 ){
-				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectItems"));
+		createOrder:function(oEvent){
+			// tüm kalemler başarılı bir şekilde simüle edilmişse ve gerekli alanlar dolu ise çalışsın.
+			sap.ui.getCore().getMessageManager().removeAllMessages();
+			// Get Data
+			var oHeader = this.getView().getModel("header").getData();
+			var aItems = this.getView().getModel("orderItems").getData().results;
+			oHeader.FuncName = "CreateOrder"
+			// Check Data
+			if ( aItems.length === 0 ){
+				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("enterItems"));
+				$(".sapMMessageToast").addClass("sapMMessageToastDanger");
 				return;
 			}
 
-			var oHeader = this.getView().getModel("header").getData();
-			var bObligatoryCheck = this._checkObligatorFields(oHeader,aSelectedItems);
-
+			var bObligatoryCheck = this._checkObligatoryFields(oHeader,aItems);
 			if ( !bObligatoryCheck ){
 				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("chckObligatory"));
-				$(".sapMMessageToast").addClass("messageInfo");
+				$(".sapMMessageToast").addClass("sapMMessageToastDanger");
 				return;
 			}
 			
+			// Deep Create
+			sap.ui.core.BusyIndicator.show();
+			let oEntry = this._getCreateDeepEntry(oHeader,aItems)
+			let mPrm = this._getCreateOrderPrm();
+			this.getView().getModel().create("/HeaderSet", oEntry, mPrm );
+		},
+		simulateOrder:function(){
+			sap.ui.getCore().getMessageManager().removeAllMessages();
+			// Get Data
+			var oHeader = this.getView().getModel("header").getData();
+			var aSelectedItems = this._getSelectedItems(this.byId("idOrderItemTab").getSelectedItems());
+			oHeader.FuncName = "SimulateOrder";
 			
-			// kaydetme modeli ile maple
+			this._simulateOrder(oHeader,aSelectedItems);
+			
+		},
+		simulateOrderPopup: function(){
+			sap.ui.getCore().getMessageManager().removeAllMessages();
+			// Get Data
+			var oHeader = this.getView().getModel("header").getData();
+			var aSelectedItems = [];
+			aSelectedItems.push(this.getView().getModel("itemView").getData());
+			oHeader.FuncName = "SimulateOrder";
+			
+			this._simulateOrder(oHeader,aSelectedItems);
 
-			// sümüle flagını x yap
+		},
+		_simulateOrder:function(oHeader,aSelectedItems){
+			// Check Data
+			if ( aSelectedItems.length === 0 ){
+				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectItems"));
+				$(".sapMMessageToast").addClass("sapMMessageToastDanger");
+				return;
+			}
 
+			var bObligatoryCheck = this._checkObligatoryFields(oHeader,aSelectedItems);
+			if ( !bObligatoryCheck ){
+				MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("chckObligatory"));
+				$(".sapMMessageToast").addClass("sapMMessageToastDanger");
+				return;
+			}
+			
+			// Deep Create
+			sap.ui.core.BusyIndicator.show();
+			let oEntry = this._getCreateDeepEntry(oHeader,aSelectedItems)
+			let mPrm = this._getSimulatePrm();
+			this.getView().getModel().create("/HeaderSet", oEntry, mPrm );
+		},
+		_getCreateDeepEntry:function(oHeader,aSelectedItems){
+			return {
+				FuncName:oHeader.FuncName,
+				Auart:oHeader.Auart,
+				Orderno:oHeader.Orderno,
+				Vkorg:oHeader.Vkorg,
+				Vtweg:oHeader.Vtweg,
+				Spart:oHeader.Spart,
+				Vkbur:oHeader.Vkbur,
+				Vkgrp:oHeader.Vkgrp,
+				Kunnr:oHeader.Kunnr,
+				Zterm:oHeader.Zterm,
+				Inco1:oHeader.Inco1,
+				Inco2:oHeader.Inco2,
+				Item : aSelectedItems.map(oSelLine=>{ return {
+						Posnr	    : oSelLine.Posnr.toString(),
+						Material    : oSelLine.Material,
+						RefDocNo    : oSelLine.RefDocNo,
+						RefDocItm   : oSelLine.RefDocItm,
+						Meins       : oSelLine.Meins,
+						ReqDate     : oSelLine.ReqDate ? new Date(oSelLine.ReqDate) : null,
+						Qty         : oSelLine.Qty ? oSelLine.Qty.toString() : "0" ,
+						UnitPrice   : oSelLine.UnitPrice ? oSelLine.UnitPrice.toString() : "0",
+						UnitCurr    : oSelLine.UnitCurr ? oSelLine.UnitCurr: "",
+						Kscha       : oSelLine.Kscha ? oSelLine.Kscha: "",
+						Price		: oSelLine.Price ? oSelLine.Price.toString() : "0",
+						Currency    : oSelLine.Currency ? oSelLine.Currency : "",
+						Simulate	: oSelLine.Simulate,
+						Usability   :[]
+					}
+				})
+			};
+		},
+		_getSimulatePrm: function(){
+			return {
+				success: function(oData,oResponse) {
+					sap.ui.core.BusyIndicator.hide();
+					let oItem = this.getView().getModel("orderItems");
+					let aItem = oItem.getData().results;
+					let aData = oData.Item.results;
 
-			// hepsini tek seferde back-ende gönder
+					for (let itmIndx = 0; itmIndx < aData.length; itmIndx++) {
+						let idx = aItem.findIndex(o => o.Posnr === parseInt(aData[itmIndx].Posnr) )
+						let aUse = aData[itmIndx].Usability.results;
+						aItem[idx].Usability = aUse;
 
-			// geri gelen usabilit datasını modeldeki uygun yere yaz.
-
-			// gelen datanın ilk satırındaki termin vemşktar bizimkini bozuyorsa tekrar simüle tiki atma,
-			// miktarı sil, tarihi sil vs.
-
-			//not: simüle edildikten sonra bir şey değiştirilirse tekrar simüle etmeyi gerekli yap
-
+						if (aUse.length != 0 &&
+							aItem[idx].Qty <= aUse[0].ReqQty && 
+							aItem[idx].ReqDate <= aUse[0].ReqDate &&
+							!aData[itmIndx].Simulate ){
+								
+								aItem[idx].Simulate = true;
+						}else{
+							aItem[idx].Simulate = false;
+							aItem[idx].Qty = null;
+							aItem[idx].ReqDate = null;
+						}
+					}
+					oItem.refresh();
+										
+				}.bind(this),
+				error: function() {
+					sap.ui.core.BusyIndicator.hide();
+				}.bind(this)
+			};
+		},
+		_getCreateOrderPrm: function(){
+			return {
+				success: function(oData,oResponse) {
+					sap.ui.core.BusyIndicator.hide();
+				
+					var sCompleteMessage = oResponse.headers["sap-message"];
+					var oMessage = JSON.parse(sCompleteMessage);
+					if ( oMessage.severity == "success" ){					
+						this._clearScreen({},sap.m.MessageBox.Action.YES);
+						this.showSuccessMessage("", oMessage.message);
+					}			
+				}.bind(this),
+				error: function() {
+					sap.ui.core.BusyIndicator.hide();
+				}
+			};
 		},
 		_getSelectedItems: function(aSelectedList) {
 			var aList = [];
@@ -882,7 +1060,7 @@ sap.ui.define([
 			}
 			return aList;
 		},
-		_checkObligatorFields:function(oHeader,aList){
+		_checkObligatoryFields:function(oHeader,aList){
 			var bObliCheck = true;
 			
 			if( this._checkInitial(this.byId("selAuart","emptyAuart"))){
@@ -922,51 +1100,93 @@ sap.ui.define([
 			var bCusRef = this.getView().getModel("mainView").getProperty("bCustomerRef");
 
 			for (let indx = 0; indx < aList.length; indx++) {
-				if ( !aList[indx].Material ||
-				     !aList[indx].TerminTarihi ||
-					 !aList[indx].Miktar ||
-					 (bCusRef && !aList[indx].RefDocNo )  ){
+				if ( oHeader.FuncName == "SimulateOrder" ){
+					
+					if ( !aList[indx].Material ||
+						!aList[indx].ReqDate ||
+						!aList[indx].Qty ||
+						(bCusRef && !aList[indx].RefDocNo )  ){
 						bObliCheck = false;
 						break;
-					 } 
+					}
+				}else if ( oHeader.FuncName == "CreateOrder" ){
+					if ( !aList[indx].Material ||
+						!aList[indx].ReqDate ||
+						!aList[indx].Qty ||
+						(bCusRef && !aList[indx].RefDocNo )  ||
+						!aList[indx].Price ||
+						!aList[indx].Currency ||
+						!aList[indx].Simulate
+						){
+						bObliCheck = false;
+						break;
+					}	
+				}
 			}
 			return bObliCheck;
 		},
-		createOrder:function(oEvent){
-			// tüm kalemler başarılı bir şekilde simüle edilmişse ve gerekli alanlar dolu ise çalışsın.
-			sap.ui.core.BusyIndicator.show();
+		onClearScreen: function(){
+			// ekranı initial duruma getir.
+			this.showConfirmationDialog("sureQs", this._clearScreen);
 
+		},
+		_clearScreen:function(oEntry,pAction){
+			if (pAction !== sap.m.MessageBox.Action.YES) {
+				return;
+			}	
+			sap.ui.getCore().getMessageManager().removeAllMessages();
 
+			let mainView = {
+				bEdit:true,
+				bCustomerRef:false,
+				delay:0
+			},
 
-			var aTransfer = this.getModel("Transfer").getProperty("/results");
-			var oTarget   = this.getModel("transferView");
-			
-			var oEntry = {
-				"Kunnr": oTarget.getProperty("/Kunnr"),
-				"Lenum": oTarget.getProperty("/trgtLnm"),	
-				"Lgpla": oTarget.getProperty("/Lgpla"),
-				"Transfer": aTransfer 
+			Header = {
+				Auart:"",
+				FuncName:"",
+				Vkorg:"",
+				Vtweg:"",
+				Spart:"",
+				Vkbur:"",
+				Vkgrp:"",
+				Kunnr:"",
+				Zterm:"",
+				Orderno:"",
+				Inco1:"",
+				Inco2:"",
+				Detail:[]
+			},
+			HeaderText ={
+				AuartDesc:"",
+				VkorgDesc:"",
+				VtwegDesc:"",
+				SpartDesc:"",
+				VkburDesc:"",
+				VkgrpDesc:"",
+				CustomerName:"",
+				ZtermDesc:"",
+				Inco1Desc:""
 			};
-			
-			var mPrm = {
-				success: function(oData,oResponse) {
-					sap.ui.core.BusyIndicator.hide();
-					
-					var sCompleteMessage = oResponse.headers["sap-message"];
-					if (sCompleteMessage) {
-						this.onClearScreen();
-						var oMessage = JSON.parse(sCompleteMessage);
-						this.showSuccessMessage("", oMessage.message);
 
-					}
-				}.bind(this),
-				error: function() {
-					sap.ui.core.BusyIndicator.hide();
-				}
-			};
-			
-			this.getView().getModel().create("/TargetSet", oEntry, mPrm );
 
+			this.getView().setModel(new JSONModel(mainView),"mainView");
+			this.getView().setModel(new JSONModel(Header),"header");
+			this.getView().setModel(new JSONModel(HeaderText),"headerText");
+			this.setJSONModel([],"orderItems");
+			this.datamodel.Item.Posnr = 0;
+
+			this.byId("selAuart").setSelectedKey("");
+			this.byId("selVkorg").setSelectedKey("");
+			this.byId("selVtweg").setSelectedKey("");
+			this.byId("selVkbur").setSelectedKey("");
+			this.byId("selVkgrp").setSelectedKey("");
+			this.byId("selSpart").setSelectedKey("");
+			this.byId("selZterm").setSelectedKey("");
+			this.byId("selInco1").setSelectedKey("");
+			this.byId("selKunnr").setSelectedKey("");
+			this.byId("inpOrder").setValue("");
+			this.byId("inpInco2").setValue("");
 		},
 		_checkInitial:function(oSource,pErrTx){
 			var sValue = oSource.getValue();
@@ -980,5 +1200,4 @@ sap.ui.define([
 			}
 		}
 	});
-
 });

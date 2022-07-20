@@ -12,10 +12,13 @@
 					<actions>
 						<ObjectPageHeaderActionButton icon="sap-icon://edit" text="{i18n>edit}" 
 							tooltip="{i18n>edit}" visible="{= !${mainView>/bEdit} }" importance="Medium" press="handleEditPress"/>
-						<ObjectPageHeaderActionButton icon="sap-icon://save" text="{i18n>save}" 
+						<ObjectPageHeaderActionButton icon="sap-icon://display" text="{i18n>display}" 
 							tooltip="{i18n>save}" visible="{mainView>/bEdit}" press="handleSavePress" />
-						<ObjectPageHeaderActionButton icon="sap-icon://decline" text="{i18n>cancel}" 
-							tooltip="{i18n>cancel}" visible="{mainView>/bEdit}" press="handleCancelPress" />
+						<!-- <ObjectPageHeaderActionButton icon="sap-icon://decline" text="{i18n>cancel}" 
+							tooltip="{i18n>cancel}" visible="{mainView>/bEdit}" press="handleCancelPress" /> -->
+						<m:Button  text="{i18n>clearAll}" 
+							tooltip="{i18n>clearAll}" press="onClearScreen" />
+						
 					</actions>
 				</ObjectPageHeader>
 			</headerTitle>
@@ -34,7 +37,18 @@
 			</sections>
 			<footer>
 				<m:OverflowToolbar>
-					<m:Button text="{i18n>addItem}" press=".addItemPopover" type="Accept" />
+					<m:Button
+						icon="sap-icon://alert"
+						text="{=${message>/}.length}"
+						visible="{=${message>/}.length > 0}"
+						type="Emphasized"
+						press="onMessagePopoverPress"/>
+					
+					<m:Button text="{i18n>addItem}" press="handleAddItemPopover" type="Accept" 
+						visible="{= ${device>/system/desktop} ? false : true }"/>
+					
+                	<m:Button icon="sap-icon://sys-minus" press="handleRemoveItem" tooltip="{i18n>remTooltip}"
+						visible="{= ${device>/system/desktop} ? false : true }"/>
 					<m:ToolbarSpacer/>
 					<m:Button type="Emphasized" press="createOrder" text="{i18n>createOrder}"/>
 				</m:OverflowToolbar>

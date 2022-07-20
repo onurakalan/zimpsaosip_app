@@ -83,7 +83,6 @@ sap.ui.define([
 
 			return sColor;
 		},
-
 		screenStatusColor: function(sStatus) {
 			/**
 			 * A: Approved

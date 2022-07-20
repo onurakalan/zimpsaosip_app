@@ -2,7 +2,8 @@
     xmlns="sap.m" 
 	xmlns:l="sap.ui.layout" 
 	xmlns:f="sap.ui.layout.form" 
-	xmlns:core="sap.ui.core">
+	xmlns:core="sap.ui.core"
+    autoPrefixId="true">
 
     <Table id="idOrderItemTab" 
             items="{orderItems>/results}" 
@@ -15,7 +16,8 @@
             selectionChange="onSelectedDetail"
             noDataText="{i18n>noDataText}"
             includeItemInSelection="false" 
-            itemPress="onPressSchedule">
+            itemPress="onPressSchedule"
+            sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
         <headerToolbar>
             <Toolbar>
                 <Label text="{i18n>orderItem}"/>
@@ -84,7 +86,7 @@
                     <ObjectIdentifier text="{orderItems>Meins}"/>
                     <Input id="refdocInput"
                         type="Text"
-                        value="{ parts : [ 'orderItems>RefDocNo','orderItems>RefDocItm' ] }" 
+                        value="{= parseFloat(${orderItems>RefDocNo})},{= parseFloat(${orderItems>RefDocItm})}" 
                         placeholder="{18n>enterRefdoc}"
                         showValueHelp="true"
                         valueHelpOnly="true"
@@ -94,18 +96,18 @@
                     <DatePicker id="reqDateInput"
                         displayFormat="short" 
                         valueFormat="yyyy-MM-dd"
-                        value="{orderItems>TerminTarihi}"
-                        valueState="{= ${orderItems>TerminTarihi} === null ? 'Error' : 'None' }"
+                        value="{orderItems>ReqDate}"
+                        valueState="{= ${orderItems>ReqDate} === null ? 'Error' : 'None' }"
                         placeholder="{18n>selectReqDate}"
                         width="100%"
                         class="sapUiTinyMarginBottom sapUiTinyMarginTop"
                         change="handleChangeReqDate"/>
                     <Input id="qtyInput"
                         type="Number"
-                        value="{path:'orderItems>Miktar', 
+                        value="{path:'orderItems>Qty', 
                                 type: 'sap.ui.model.type.Float', 
                                 formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
-                        valueState="{= ${orderItems>Miktar} === 0 || ${orderItems>Miktar} === null ? 'Error' : 'None' }"
+                        valueState="{= ${orderItems>Qty} === 0 || ${orderItems>Qty} === null ? 'Error' : 'None' }"
                         placeholder="{18n>enterQty}"
                         class="sapUiTinyMarginBottom sapUiTinyMarginTop"
                         width="100%"

@@ -11,7 +11,6 @@
 			<f:content>
 				<Label text="{i18n>auart}" labelFor="selAuart" required="true"/>
 				<ComboBox id="selAuart" enabled="true" width="19rem"
-						value="{header>/Auart}"
 						selectionChange="onChangeAuart" 
 						items="{/ShAuartSet}" showSecondaryValues="true" filterSecondaryValues="true">
 					<core:ListItem key="{Auart}" text="{Bezei}"  additionalText="{Auart}"/>

@@ -26,9 +26,6 @@
 				<!---->
 				<Label text="{i18n>vkgrp}"/>
 				<Text text="{headerText>/VkgrpDesc}" width="17rem"/>
-
-				<Label />
-				<Text width="17rem"/>
 				<!---->
 				<Label text="{i18n>kunnr}"/>
 				<Text text="{headerText>/CustomerName}" width="17rem" />
@@ -36,6 +33,7 @@
 				<Label text="{i18n>bstkd}"/>
 				<CheckBox selected="{mainView>/bCustomerRef}" enabled="false"/>
 				<!---->
+				
 				<Label text="{i18n>order}"/>
 				<Text text="{header>/Orderno}" width="17rem"/>
 				<!---->

@@ -1,0 +1,103 @@
+<core:FragmentDefinition 
+    xmlns="sap.m" 
+	xmlns:l="sap.ui.layout" 
+	xmlns:f="sap.ui.layout.form" 
+	xmlns:core="sap.ui.core"
+    autoPrefixId="true">
+
+    <Table id="idOrderItemTab2" 
+            items="{orderItems>/results}" 
+            inset="false" 
+            backgroundDesign="Transparent" 
+            width="auto" 
+            class="sapUiNoContentPadding"
+            modeAnimationOn="true" 
+            mode="MultiSelect" 
+            selectionChange="onSelectedDetail"
+            noDataText="{i18n>noDataText}"
+            includeItemInSelection="false" 
+            itemPress="onPressSchedule"
+            sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+        <headerToolbar>
+            <Toolbar>
+                <Label text="{i18n>orderItem}"/>
+            </Toolbar>
+        </headerToolbar>
+        <infoToolbar>
+            <OverflowToolbar visible="false" id="idInfoToolbar2">
+                <Label id="idFilterLabel2"/>
+            </OverflowToolbar>
+        </infoToolbar>
+        <columns >
+            <Column minScreenWidth="Desktop" demandPopin="false" width="5rem"  hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>posnr}"/>
+            </Column>
+            <Column minScreenWidth="Phone" demandPopin="true" width="auto"  hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>material}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="10rem"  hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>materialDesc}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="4rem"  hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>meins}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="auto"  hAlign="Begin" vAlign="Middle" 
+                    visible="{mainView>/bCustomerRef}">
+                <Text text="{i18n>refDoc}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="7rem"  hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>reqDate}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="9rem" hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>qty}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="6rem" hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>unitPrice}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="6rem" hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>price}"/>
+            </Column>
+            <Column minScreenWidth="Desktop" demandPopin="true" width="6rem" hAlign="Begin" vAlign="Middle">
+                <Text text="{i18n>currency}"/>
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Navigation" >
+                <cells>
+                    <ObjectIdentifier title="{= parseFloat(${orderItems>Posnr})}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+                    <ObjectIdentifier text="{orderItems>Material}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+                    <ObjectIdentifier text="{orderItems>MaterialDesc}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+                    <ObjectIdentifier text="{orderItems>Meins}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+                    <ObjectIdentifier text="{= parseFloat(${orderItems>RefDocNo})},{= parseFloat(${orderItems>RefDocItm})}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+                    <ObjectIdentifier text="{path:'orderItems>ReqDate', type:'sap.ui.model.type.Date', formatOptions: { style: 'long'} }" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+                    <ObjectNumber number="{path:'orderItems>Qty', 
+                                type: 'sap.ui.model.type.Float', 
+                                formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+                        unit="{CurrencyCode}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>
+					<ObjectNumber
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                        number="{ parts:[{path:'orderItems>UnitPrice'},{path:'orderItems>UnitCurr'}],
+                                  type: 'sap.ui.model.type.Currency',
+                                  formatOptions: {showMeasure: false} }"
+                        unit="{orderItems>UnitCurr}" />
+                    <ObjectNumber 
+                        number="{path:'orderItems>Price', 
+                                type: 'sap.ui.model.type.Float', 
+                                formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                        width="100%"/> 
+                     <ObjectAttribute
+                        text="{orderItems>Currency}" 
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"/>                                   
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

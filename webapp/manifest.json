@@ -93,7 +93,7 @@
 				"settings": {
 					"defaultCountMode": "None",
 					"json": true,
-					"defaultBindingMode": "OneWay",
+					"defaultBindingMode": "TwoWay",
 					"defaultOperationMode": "Auto"
 				},
 				"dataSource": "mainService",

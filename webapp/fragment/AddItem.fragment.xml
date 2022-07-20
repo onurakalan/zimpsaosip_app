@@ -1,0 +1,112 @@
+<core:FragmentDefinition
+    xmlns="sap.m" 
+    xmlns:l="sap.ui.layout" 
+    xmlns:f="sap.ui.layout.form" 
+    xmlns:core="sap.ui.core"
+    autoPrefixId="true">
+	<Dialog 
+        title="{i18n>addItem}" 
+		contentHeight="auto"
+		contentWidth="auto"
+        resizable="true"
+        draggable="true">
+		<content>
+            <f:SimpleForm
+                id="idForms" 
+                maxContainerCols="2" labelSpanL="3" labelSpanM="2" columnsL="2" columnsM="2" editable="true"
+                layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                emptySpanS="0" columnsXL="2" singleContainerFullSize="false" >
+                <f:content>
+                    <Label text="{i18n>material}" labelFor="productInput" required="true"/>
+                    <Input id="productInput"
+                                type="Text"
+                                value="{itemView>/Material}"
+                                placeholder="{18n>enterProduct}"
+                                showValueHelp="true"
+                                valueHelpOnly="true"
+                                class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                                valueHelpRequest="handleValueHelp"
+                                width="100%" />
+                    <Label text="{i18n>materialDesc}"/>
+                    <ObjectIdentifier text="{itemView>/MaterialDesc}"/>
+                    <Label text="{i18n>meins}"/>
+                    <ObjectIdentifier text="{itemView>/Meins}"/>
+                    <Label text="{i18n>refDoc}" labelFor="refdocInput" visible="{mainView>/bCustomerRef}" />
+                    <Input id="refdocInput"
+                        type="Text" 
+                        value="{= parseFloat(${itemView>/RefDocNo})},{= parseFloat(${itemView>/RefDocItm})}"
+                        placeholder="{18n>enterRefdoc}"
+                        showValueHelp="true"
+                        valueHelpOnly="true"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+						valueHelpRequest="handleValueHelpRefdoc"
+                        width="100%"
+                        visible="{mainView>/bCustomerRef}"/>
+                    <Label text="{i18n>reqDate}"/>
+                    <DatePicker id="reqDateInput"
+                        displayFormat="short" 
+                        valueFormat="yyyy-MM-dd"
+                        value="{itemView>/ReqDate}"
+                        valueState="{= ${itemView>/ReqDate} === null ? 'Error' : 'None' }"
+                        placeholder="{18n>selectReqDate}"
+                        width="100%"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                        change="handleChangeReqDate"/>
+                    <Label text="{i18n>qty}"/>
+                    <Input id="qtyInput"
+                        type="Number"
+                        value="{path:'itemView>/Qty', 
+                                type: 'sap.ui.model.type.Float', 
+                                formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+                        valueState="{= ${itemView>/Qty} === 0 || ${itemView>/Qty} === null ? 'Error' : 'None' }"
+                        placeholder="{18n>enterQty}"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                        width="100%"
+                        change="handleChangeQty" />
+                    <Label/>
+                    <Button icon="sap-icon://simulate" text="{i18n>simulation}" press="simulateOrderPopup" tooltip="{i18n>simulation}" type="Emphasized"/>
+                    <Label text="{i18n>unitPrice}" visible="{itemView>/Simulate}"/>
+                    
+                    <ObjectNumber
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                        number="{ parts:[{path:'itemView>/UnitPrice'},{path:'itemView>/UnitCurr'}],
+                                  type: 'sap.ui.model.type.Currency',
+                                  formatOptions: {showMeasure: false} }"
+                        unit="{itemView>/UnitCurr}" visible="{itemView>/Simulate}"/>
+                    <Label text="{i18n>price}" visible="{itemView>/Simulate}"/>
+                    <Input id="priceInput"
+                        type="Number"
+                        enabled="{itemView>/Simulate}"
+                        value="{path:'itemView>/Price', 
+                                type: 'sap.ui.model.type.Float', 
+                                formatOptions: { minFractionDigits: 2, maxFractionDigits: 2}}"
+                        placeholder="{18n>enterPrice}"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+                        width="100%"
+                        change="handleChangePrice" 
+                        visible="{itemView>/Simulate}"/> 
+                    <Label text="{i18n>currency}" visible="{itemView>/Simulate}"/>
+                    <Input id="currInput"
+                        type="Text"
+                        enabled="{itemView>/Simulate}"
+                        value="{itemView>/Currency}" 
+                        placeholder="{18n>selectCurrency}"
+                        showValueHelp="true"
+                        valueHelpOnly="true"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginTop"
+						valueHelpRequest="handleValueHelpCurrency"
+                        width="100%" 
+                        visible="{itemView>/Simulate}"/>  
+                </f:content>
+            </f:SimpleForm>
+        </content>
+		<beginButton>
+            <Button text="{i18n>confirm}" type="Emphasized"  
+            enabled="{= ${itemView>/Simulate} &amp;&amp; ${itemView>/Currency} &amp;&amp; ${itemView>/Price}   ? true : false }" press="handleAddItemConfirm"/>
+		
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>cancel}" press="handleAddItemCancel"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

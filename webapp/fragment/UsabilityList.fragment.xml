@@ -1,0 +1,45 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<TableSelectDialog
+		id="idScheduleTab"
+		noDataText="{i18n>noData}"
+		title="{i18n>usabilityList}"
+		cancel=".handleClose"
+		items="{
+			path : '{usabilityList>/results}',
+			sorter : {
+				path : 'Posnr',
+				descending : false
+			}
+		}">
+		<ColumnListItem vAlign="Middle">
+			<cells>
+				<ObjectIdentifier title="{Posnr}"  />
+                <ObjectAttribute text="{path:'{ReqDate}', 
+                                        type:'sap.ui.model.type.Date', 
+                                        formatOptions: { style: 'long'} }" />
+				<ObjectNumber
+					number="{ReqQty}"
+					unit="{Meins}"/>
+			</cells>
+		</ColumnListItem>
+		<columns>
+			<Column width="12em">
+				<header>
+					<Text text="{i18n>usaLine}" />
+				</header>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<header>
+					<Text text="{i18n>reqDate}" />
+				</header>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<header>
+					<Text text="{i18n>reqQty}" />
+				</header>
+			</Column>
+		</columns>
+	</TableSelectDialog>
+</core:FragmentDefinition>
